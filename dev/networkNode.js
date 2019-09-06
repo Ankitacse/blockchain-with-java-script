@@ -190,39 +190,68 @@ app.get('/consensus', function (req, res) {
 
     });
     Promise.all(requestPromises)
-    .then(blockchains => {
-        const currentChainLength = bitcoin.chain.length;
-        let maxChainLength = currentChainLength;
-        let newLongestChain = null;
-        let newPendingTransactions = null;
-        blockchains.forEach(blockchain => {
-            if (blockchain.chain.length > maxChainLength) {
-                maxChainLength = blockchain.chain.length;
-                newLongestChain = blockchain.chain;
-                newPendingTransactions = blockchain.pendingTransactions;
-            };
+        .then(blockchains => {
+            const currentChainLength = bitcoin.chain.length;
+            let maxChainLength = currentChainLength;
+            let newLongestChain = null;
+            let newPendingTransactions = null;
+            blockchains.forEach(blockchain => {
+                if (blockchain.chain.length > maxChainLength) {
+                    maxChainLength = blockchain.chain.length;
+                    newLongestChain = blockchain.chain;
+                    newPendingTransactions = blockchain.pendingTransactions;
+                };
+            });
+
+            if (!newLongestChain || (newLongestChain && !bitcoin.chainIsValid(newLongestChain))) {
+                res.json({
+                    note: "Current chain has not been replaced",
+                    chain: bitcoin.chain
+                });
+            }
+            else {
+                bitcoin.chain = newLongestChain;
+                bitcoin.pendingTransactions = newPendingTransactions;
+                res.json({
+                    note: 'This chain has been replaced',
+                    chain: bitcoin.chain
+                });
+
+            }
+
         });
+});
+//querry blockchain for specific hash
 
-        if (!newLongestChain || (newLongestChain && !bitcoin.chainIsValid(newLongestChain))) {
-            res.json({
-                note: "Current chain has not been replaced",
-                chain: bitcoin.chain
-            });
-        }
-        else {
-            bitcoin.chain = newLongestChain;
-            bitcoin.pendingTransactions = newPendingTransactions;
-            res.json({
-                note: 'This chain has been replaced',
-                chain: bitcoin.chain
-            });
-
-        }
-
+app.get('/block/:blockHash', function (req, res) {
+    //localhost:3001/block/AGGFBHHHVBNNJHB
+    const blockHash = req.params.blockHash;
+    const correctBlock = bitcoin.getBlock(blockHash);
+    res.json({
+        block: correctBlock
     });
 });
 
+//querry blockchain for specific transaction
+app.get('/transaction/:transactionId', function (req, res) {
+const transactionId =req.params.transactionId;
+const transactionData=bitcoin.getTransaction(transactionId);
+res.json({
+transaction:transactionData.transaction,
+block:transactionData.block
+});
+});
 
+//querry blockchain for specific address
+app.get('/address/:address', function (req, res) {
+
+const address=req.params.address;
+const addressData=bitcoin.getAddressData(address);
+res.json({
+addressData:addressData
+});
+});
+//port to listen
 app.listen(port, function () {
     console.log(`Listning on port ${port}...`);
 });
