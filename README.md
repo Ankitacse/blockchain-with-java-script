@@ -1,4 +1,6 @@
-# branch follow # synchornize
+# branch follow 
+development
+
 # blockchain-with-java-script #cryptocurrency
 we made block chain project using java script and creating own Cryptocurrency running on different nodes
 # Run using following cmd in terminal
