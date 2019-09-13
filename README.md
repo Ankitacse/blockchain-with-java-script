@@ -44,7 +44,7 @@ choose Transaction to see data accroding to transaction.
 
 # connect with ehter or XRP or any to use transaction
 # method used
-SSHA-256 ,CONSENSUS- long-chain rule used for implication
+SSHA-256 ,CONSENSUS- long-chain rule ,reward for reaching the Target used for implication
 
 and some plugin can see on network.js #
 THANKS
